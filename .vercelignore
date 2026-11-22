@@ -1,0 +1,9 @@
+Kho_SGK_SBT/
+lich_bao_giang*
+__pycache__/
+*.pyc
+*.db
+*.db-journal
+.git/
+.venv/
+venv/

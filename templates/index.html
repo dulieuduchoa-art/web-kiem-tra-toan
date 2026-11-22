@@ -1,0 +1,194 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Hệ Thống Kiểm Tra Trực Tuyến Môn Toán THPT</title>
+  
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+  
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="min-h-screen flex flex-col bg-slate-50 text-slate-800">
+
+  <!-- Header Navigation -->
+  <header class="glass-nav sticky top-0 z-40">
+    <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+      <div class="flex items-center gap-3">
+        <div class="w-10 h-10 rounded-xl bg-gradient-to-tr from-blue-600 to-indigo-600 flex items-center justify-center text-white font-black text-xl shadow-md">
+          ∑
+        </div>
+        <div>
+          <span class="font-extrabold text-lg text-slate-900 tracking-tight">Toán THPT Online</span>
+          <span class="hidden sm:inline-block ml-2 px-2 py-0.5 rounded text-[11px] font-bold bg-blue-100 text-blue-700">Khối 10 & 12</span>
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3">
+        <a href="/teacher" class="flex items-center gap-2 px-4 py-2 rounded-xl bg-white border border-slate-200 text-sm font-bold text-slate-700 hover:text-blue-600 hover:border-blue-300 shadow-sm transition-all">
+          <span>👨‍🏫 Khu Vực Giáo Viên</span>
+        </a>
+      </div>
+    </div>
+  </header>
+
+  <!-- Hero Section -->
+  <main class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-10 w-full">
+    <div class="text-center max-w-3xl mx-auto mb-12">
+      <span class="inline-block px-3.5 py-1 rounded-full text-xs font-bold uppercase tracking-wider bg-blue-100 text-blue-800 mb-4">
+        Cấu Trúc Đề Thi Tốt Nghiệp THPT Mới - Bộ GD&ĐT
+      </span>
+      <h1 class="text-3xl sm:text-4xl md:text-5xl font-black text-slate-900 tracking-tight leading-tight mb-4">
+        Hệ Thống Kiểm Tra Trực Tuyến <br>
+        <span class="bg-clip-text text-transparent bg-gradient-to-r from-blue-600 to-indigo-600">Toán Học Khối 10 & Khối 12</span>
+      </h1>
+      <p class="text-slate-600 text-base sm:text-lg max-w-2xl mx-auto">
+        Chuẩn ma trận 22 câu = 10 điểm (Phần I: 12 câu trắc nghiệm • Phần II: 4 câu đúng/sai lũy tiến • Phần III: 6 câu trả lời ngắn). Hiển thị công thức KaTeX sắc nét, chống gian lận và chấm điểm tức thì.
+      </p>
+
+      <!-- Quick Code Entry Form -->
+      <div class="mt-8 max-w-md mx-auto p-2 bg-white rounded-2xl shadow-lg border border-slate-200 flex flex-col sm:flex-row gap-2">
+        <input type="text" id="direct-exam-id" placeholder="Nhập mã đề thi (ví dụ: f4dc3f13)..." class="flex-1 px-4 py-3 rounded-xl bg-slate-50 border border-slate-200 text-slate-800 font-semibold focus:outline-none focus:border-blue-600 focus:bg-white text-sm" />
+        <button onclick="joinExamDirect()" class="px-6 py-3 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-sm shadow-md transition-all">
+          Vào Thi Ngay
+        </button>
+      </div>
+    </div>
+
+    <!-- Features Matrix Banner -->
+    <div class="grid grid-cols-1 md:grid-cols-3 gap-6 mb-12">
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-blue-100 text-blue-700 flex items-center justify-center font-bold text-xl mb-4">
+          I
+        </div>
+        <h3 class="text-base font-bold text-slate-900 mb-1">Phần I: 12 Câu Trắc Nghiệm</h3>
+        <p class="text-sm text-slate-600">4 lựa chọn (A, B, C, D) với 0,25 điểm/câu = 3,0 điểm. Nhận biết và thông hiểu cơ bản.</p>
+      </div>
+
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-amber-100 text-amber-700 flex items-center justify-center font-bold text-xl mb-4">
+          II
+        </div>
+        <h3 class="text-base font-bold text-slate-900 mb-1">Phần II: 4 Câu Đúng / Sai</h3>
+        <p class="text-sm text-slate-600">Mỗi câu 4 ý a, b, c, d. Chấm lũy tiến chuẩn Bộ GD&ĐT: đúng 1 ý 0,1đ; 2 ý 0,25đ; 3 ý 0,5đ; 4 ý 1,0đ.</p>
+      </div>
+
+      <div class="p-6 bg-white rounded-2xl border border-slate-200 shadow-sm hover:shadow-md transition-shadow">
+        <div class="w-12 h-12 rounded-xl bg-emerald-100 text-emerald-700 flex items-center justify-center font-bold text-xl mb-4">
+          III
+        </div>
+        <h3 class="text-base font-bold text-slate-900 mb-1">Phần III: 6 Câu Trả Lời Ngắn</h3>
+        <p class="text-sm text-slate-600">Học sinh nhập số, tự động chấp nhận cả dấu chấm . và dấu phẩy , cho số thập phân. 0,5 điểm/câu = 3,0 điểm.</p>
+      </div>
+    </div>
+
+    <!-- Active Exams List -->
+    <div class="bg-white rounded-3xl border border-slate-200 p-6 sm:p-8 shadow-sm">
+      <div class="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-6 pb-4 border-b border-slate-100">
+        <div>
+          <h2 class="text-2xl font-black text-slate-900">Danh Sách Đề Kiểm Tra Sẵn Sàng</h2>
+          <p class="text-sm text-slate-500">Học sinh chọn đề kiểm tra bên dưới để vào làm bài ngay</p>
+        </div>
+        <div class="flex items-center gap-2">
+          <button onclick="filterExams('all')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white" id="f-all">Tất cả</button>
+          <button onclick="filterExams('12')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" id="f-12">Khối 12</button>
+          <button onclick="filterExams('10')" class="filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200" id="f-10">Khối 10</button>
+        </div>
+      </div>
+
+      <div id="exams-grid" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
+        <!-- Injected via Javascript -->
+      </div>
+    </div>
+  </main>
+
+  <!-- Footer -->
+  <footer class="mt-auto border-t border-slate-200 bg-white py-6">
+    <div class="max-w-7xl mx-auto px-4 text-center text-sm text-slate-500">
+      Ứng Dụng Kiểm Tra Trực Tuyến Môn Toán THPT • Tích hợp KaTeX & Đồng bộ Kho SGK/SBT (KNTT, CTST, CKP, CD)
+    </div>
+  </footer>
+
+  <script src="/static/js/app.js"></script>
+  <script>
+    let allExams = [];
+
+    async function loadExams() {
+      try {
+        const res = await fetch('/api/exams');
+        const data = await res.json();
+        allExams = data.exams || [];
+        renderExams(allExams);
+      } catch (e) {
+        console.error(e);
+      }
+    }
+
+    function renderExams(exams) {
+      const grid = document.getElementById('exams-grid');
+      grid.innerHTML = '';
+
+      if (exams.length === 0) {
+        grid.innerHTML = '<div class="col-span-full text-center py-12 text-slate-400">Chưa có đề thi nào được tạo. Giáo viên có thể truy cập khu vực giáo viên để tạo đề!</div>';
+        return;
+      }
+
+      exams.forEach(ex => {
+        const card = document.createElement('div');
+        card.className = 'p-6 bg-slate-50 hover:bg-white rounded-2xl border border-slate-200 hover:border-blue-400 shadow-sm hover:shadow-md transition-all flex flex-col justify-between';
+        
+        card.innerHTML = `
+          <div>
+            <div class="flex items-center justify-between gap-2 mb-3">
+              <span class="px-2.5 py-0.5 rounded-full text-xs font-bold ${ex.grade == '12' ? 'bg-indigo-100 text-indigo-700' : 'bg-emerald-100 text-emerald-700'}">
+                Khối ${ex.grade}
+              </span>
+              <span class="text-xs font-medium text-slate-500">⏱ ${ex.duration_minutes} phút</span>
+            </div>
+            <h3 class="font-bold text-slate-900 text-base mb-2 line-clamp-2">${ex.title}</h3>
+            <p class="text-xs text-slate-500 mb-4">Chuẩn 22 câu Bộ GD&ĐT • Đã có ${ex.submission_count || 0} lượt nộp</p>
+          </div>
+          <div class="pt-4 border-t border-slate-200/60 flex items-center justify-between gap-2">
+            <span class="text-xs text-slate-400">Mã: ${ex.id}</span>
+            <a href="/exam/${ex.id}" class="px-4 py-2 rounded-xl bg-blue-600 hover:bg-blue-700 text-white font-bold text-xs shadow-sm transition-colors">
+              Bắt Đầu Thi ➔
+            </a>
+          </div>
+        `;
+        grid.appendChild(card);
+      });
+    }
+
+    function filterExams(grade) {
+      document.querySelectorAll('.filter-btn').forEach(b => {
+        b.className = 'filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-slate-100 text-slate-700 hover:bg-slate-200';
+      });
+      document.getElementById('f-' + grade).className = 'filter-btn px-3 py-1.5 rounded-lg text-xs font-bold bg-blue-600 text-white';
+
+      if (grade === 'all') {
+        renderExams(allExams);
+      } else {
+        renderExams(allExams.filter(e => e.grade == grade));
+      }
+    }
+
+    function joinExamDirect() {
+      const val = document.getElementById('direct-exam-id').value.trim();
+      if (!val) {
+        App.showToast('Vui lòng nhập mã đề thi!', 'warning');
+        return;
+      }
+      window.location.href = `/exam/${val}`;
+    }
+
+    document.addEventListener('DOMContentLoaded', loadExams);
+  </script>
+</body>
+</html>

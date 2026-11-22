@@ -1,0 +1,284 @@
+<!DOCTYPE html>
+<html lang="vi">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Làm Bài Kiểm Tra Môn Toán THPT</title>
+
+  <!-- Tailwind CSS -->
+  <script src="https://cdn.tailwindcss.com"></script>
+
+  <!-- KaTeX -->
+  <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.css">
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/katex.min.js"></script>
+  <script defer src="https://cdn.jsdelivr.net/npm/katex@0.16.9/dist/contrib/auto-render.min.js"></script>
+
+  <!-- Custom CSS -->
+  <link rel="stylesheet" href="/static/css/style.css">
+</head>
+<body class="min-h-screen bg-slate-50 text-slate-800 flex flex-col select-none">
+
+  <!-- ========================================================
+       SCREEN 0: LOADING STATE
+       ======================================================== -->
+  <div id="loading-state" class="flex-1 flex items-center justify-center p-6">
+    <div class="text-center">
+      <div class="w-12 h-12 border-4 border-blue-600 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <p class="text-sm font-semibold text-slate-600">Đang chuẩn bị đề thi Toán...</p>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN 1: WELCOME & STUDENT INFO ENTRY
+       ======================================================== -->
+  <div id="start-screen" class="flex-1 flex items-center justify-center p-4 sm:p-6 hidden">
+    <div class="max-w-xl w-full bg-white rounded-3xl p-6 sm:p-10 shadow-xl border border-slate-200 text-center">
+      <div class="w-16 h-16 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-black text-2xl mx-auto mb-4">
+        ∑
+      </div>
+
+      <div class="inline-block px-3 py-1 rounded-full text-xs font-bold bg-blue-50 text-blue-700 mb-2" id="exam-grade-badge">
+        Khối 12
+      </div>
+      <h1 id="exam-title-display" class="text-2xl sm:text-3xl font-black text-slate-900 mb-4 leading-snug">
+        Đề Kiểm Tra Môn Toán THPT
+      </h1>
+
+      <div class="grid grid-cols-2 gap-4 max-w-sm mx-auto mb-6 p-4 rounded-2xl bg-slate-50 border border-slate-100 text-sm">
+        <div>
+          <span class="text-xs text-slate-500 block">Thời gian làm bài</span>
+          <span id="exam-duration-display" class="font-bold text-slate-900 text-base">50 phút</span>
+        </div>
+        <div>
+          <span class="text-xs text-slate-500 block">Số lượng câu hỏi</span>
+          <span id="exam-qcount-display" class="font-bold text-slate-900 text-base">22 câu (10đ)</span>
+        </div>
+      </div>
+
+      <div class="text-left mb-6 p-4 rounded-2xl bg-amber-50 border border-amber-200 text-amber-900 text-xs leading-relaxed">
+        <div class="font-bold mb-1 flex items-center gap-1.5 text-amber-800">
+          <span>⚠️</span> QUY CHẾ VÀ LƯU Ý KHI LÀM BÀI:
+        </div>
+        <ul class="list-disc list-inside space-y-1">
+          <li>Đề thi chuẩn 3 phần (Phần I: 12 câu TN • Phần II: 4 câu Đúng/Sai • Phần III: 6 câu điền số).</li>
+          <li><b>Hệ thống giám sát chuyển tab:</b> Mọi hành vi rời khỏi màn hình kiểm tra đều được tự động ghi nhận và gửi đến giáo viên.</li>
+          <li>Hệ thống tự động lưu bài làm và tự động nộp khi hết giờ.</li>
+        </ul>
+      </div>
+
+      <form onsubmit="event.preventDefault(); StudentExam.startExam();" class="space-y-4 text-left">
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Họ và Tên Học Sinh <span class="text-rose-500">*</span></label>
+          <input type="text" id="student-name-input" placeholder="Ví dụ: Nguyễn Văn An" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white text-base" />
+        </div>
+
+        <div>
+          <label class="block text-xs font-bold text-slate-700 uppercase mb-1">Lớp Học <span class="text-rose-500">*</span></label>
+          <input type="text" id="student-class-input" placeholder="Ví dụ: 12A1 hoặc 10A2" required class="w-full px-4 py-3 bg-slate-50 border border-slate-300 rounded-xl font-bold text-slate-800 focus:outline-none focus:border-blue-600 focus:bg-white text-base uppercase" />
+        </div>
+
+        <button type="submit" class="w-full py-4 rounded-2xl bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-700 hover:to-indigo-700 text-white font-extrabold text-base shadow-lg transition-all transform hover:-translate-y-0.5">
+          Bắt Đầu Làm Bài ➔
+        </button>
+      </form>
+    </div>
+  </div>
+
+  <!-- ========================================================
+       SCREEN 2: ACTIVE EXAM SCREEN
+       ======================================================== -->
+  <div id="exam-active-screen" class="flex-1 flex flex-col hidden">
+    
+    <!-- Sticky Top Exam Navbar -->
+    <header class="glass-nav sticky top-0 z-40 py-2.5 px-4 shadow-sm">
+      <div class="max-w-7xl mx-auto flex items-center justify-between gap-3">
+        
+        <!-- Left: Exam Title & Student Info -->
+        <div class="flex items-center gap-3 overflow-hidden">
+          <div class="w-9 h-9 rounded-xl bg-blue-600 text-white font-bold flex items-center justify-center flex-shrink-0 text-sm">
+            ∑
+          </div>
+          <div class="truncate">
+            <h2 id="active-exam-title" class="font-extrabold text-xs sm:text-sm text-slate-900 truncate">Đề Thi Toán</h2>
+            <div id="active-student-info" class="text-[11px] font-semibold text-blue-600 truncate">Học sinh - Lớp</div>
+          </div>
+        </div>
+
+        <!-- Right: Timer, Answered Badge, and Submit Button -->
+        <div class="flex items-center gap-2 sm:gap-3 flex-shrink-0">
+          
+          <!-- Timer Display Card -->
+          <div id="timer-card" class="px-3 py-1.5 sm:px-4 sm:py-2 rounded-xl bg-slate-100 border border-slate-200 text-slate-800 flex items-center gap-2 font-mono font-bold text-sm sm:text-base">
+            <span class="text-xs">⏱</span>
+            <span id="countdown-timer">00:00</span>
+          </div>
+
+          <!-- Answered Counter -->
+          <div class="hidden sm:flex items-center gap-1.5 px-3 py-2 rounded-xl bg-slate-100 border border-slate-200 text-xs font-bold text-slate-700">
+            <span>Đã làm:</span>
+            <span id="answered-count-badge" class="text-blue-600">0/22</span>
+          </div>
+
+          <!-- Mobile Toggle Palette Button -->
+          <button id="mobile-palette-toggle" class="lg:hidden p-2 rounded-xl border border-slate-200 bg-white text-slate-700 text-xs font-bold">
+            🔢
+          </button>
+
+          <!-- Submit Button -->
+          <button onclick="StudentExam.promptSubmit()" class="px-4 py-2 sm:px-5 sm:py-2 rounded-xl bg-emerald-600 hover:bg-emerald-700 text-white font-extrabold text-xs sm:text-sm shadow-md transition-all">
+            Nộp Bài
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Exam Body: Questions & Navigation Palette -->
+    <div class="flex-1 max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6 w-full flex gap-8">
+      
+      <!-- Questions Column -->
+      <main class="flex-1 min-w-0" id="questions-container">
+        <!-- Rendered via Javascript with KaTeX -->
+      </main>
+
+      <!-- Question Palette Sticky Sidebar (Desktop) -->
+      <aside class="hidden lg:block w-72 flex-shrink-0">
+        <div class="sticky top-20 bg-white rounded-3xl p-6 border border-slate-200 shadow-sm space-y-5">
+          <div class="flex items-center justify-between pb-3 border-b border-slate-100">
+            <h3 class="font-extrabold text-sm text-slate-900">Danh Sách Câu Hỏi</h3>
+            <span class="text-[11px] font-bold text-slate-500">22 câu</span>
+          </div>
+
+          <!-- Section 1 -->
+          <div>
+            <div class="text-[11px] font-bold text-blue-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Phần I: Trắc nghiệm</span>
+              <span class="text-slate-400 font-normal">12 câu</span>
+            </div>
+            <div id="palette-part1" class="grid grid-cols-4 gap-2">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Section 2 -->
+          <div>
+            <div class="text-[11px] font-bold text-amber-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Phần II: Đúng / Sai</span>
+              <span class="text-slate-400 font-normal">4 câu</span>
+            </div>
+            <div id="palette-part2" class="grid grid-cols-4 gap-2">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <!-- Section 3 -->
+          <div>
+            <div class="text-[11px] font-bold text-emerald-700 uppercase tracking-wider mb-2 flex items-center justify-between">
+              <span>Phần III: Trả lời ngắn</span>
+              <span class="text-slate-400 font-normal">6 câu</span>
+            </div>
+            <div id="palette-part3" class="grid grid-cols-4 gap-2">
+              <!-- Injected via JS -->
+            </div>
+          </div>
+
+          <div class="pt-3 border-t border-slate-100 text-[11px] text-slate-500 flex items-center justify-between">
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-blue-600 inline-block"></span> Đã làm</span>
+            <span class="flex items-center gap-1.5"><span class="w-3 h-3 rounded bg-slate-200 inline-block"></span> Chưa làm</span>
+          </div>
+        </div>
+      </aside>
+    </div>
+
+    <!-- Mobile Drawer for Question Palette -->
+    <div id="question-palette-drawer" class="lg:hidden fixed inset-x-0 bottom-0 bg-white rounded-t-3xl border-t border-slate-200 shadow-2xl p-6 z-40 max-h-[70vh] overflow-y-auto hidden">
+      <div class="flex items-center justify-between mb-4">
+        <h3 class="font-extrabold text-base text-slate-900">Bảng Câu Hỏi (Chuyển Nhanh)</h3>
+        <button onclick="document.getElementById('question-palette-drawer').classList.add('hidden')" class="w-8 h-8 rounded-full bg-slate-100 flex items-center justify-center font-bold text-slate-600">✕</button>
+      </div>
+
+      <div class="space-y-4">
+        <div>
+          <div class="text-xs font-bold text-blue-700 uppercase mb-2">Phần I: Trắc nghiệm (Câu 1 - 12)</div>
+          <div class="grid grid-cols-6 gap-2" id="mobile-palette-p1"></div>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-amber-700 uppercase mb-2">Phần II: Đúng / Sai (Câu 13 - 16)</div>
+          <div class="grid grid-cols-4 gap-2" id="mobile-palette-p2"></div>
+        </div>
+        <div>
+          <div class="text-xs font-bold text-emerald-700 uppercase mb-2">Phần III: Trả lời ngắn (Câu 17 - 22)</div>
+          <div class="grid grid-cols-6 gap-2" id="mobile-palette-p3"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Anti-Cheat Tab Switch Warning Modal -->
+  <div id="anti-cheat-modal" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-rose-200 text-center animate-bounce-once">
+      <div class="w-16 h-16 rounded-2xl bg-rose-100 text-rose-600 flex items-center justify-center font-bold text-3xl mx-auto mb-4">
+        ⚠️
+      </div>
+      <h3 class="text-xl font-black text-rose-600 mb-2">CẢNH BÁO RỜI MÀN HÌNH!</h3>
+      <p class="text-sm text-slate-700 mb-4 leading-relaxed">
+        Bạn vừa chuyển tab hoặc rời khỏi cửa sổ kiểm tra. Hệ thống đã ghi nhận lần vi phạm thứ:
+      </p>
+      <div class="inline-block px-5 py-2 rounded-2xl bg-rose-50 border border-rose-200 font-mono font-black text-2xl text-rose-600 mb-6">
+        Lần thứ <span id="tab-switch-count-display">1</span>
+      </div>
+      <p class="text-xs text-slate-500 mb-6">
+        Thông tin vi phạm này sẽ được lưu trữ và hiển thị trực tiếp trong bảng điểm gửi cho giáo viên bộ môn.
+      </p>
+      <button onclick="StudentExam.closeAntiCheatModal()" class="w-full py-3.5 rounded-xl bg-slate-900 hover:bg-slate-800 text-white font-bold text-sm shadow-md transition-all">
+        Tôi Đã Hiểu, Tiếp Tục Làm Bài
+      </button>
+    </div>
+  </div>
+
+  <!-- Submit Confirmation Modal -->
+  <div id="submit-confirm-modal" class="fixed inset-0 bg-slate-900/60 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="bg-white rounded-3xl p-8 max-w-md w-full shadow-2xl border border-slate-100 text-center">
+      <div class="w-14 h-14 rounded-2xl bg-blue-100 text-blue-600 flex items-center justify-center font-bold text-2xl mx-auto mb-4">
+        📋
+      </div>
+      <h3 class="text-xl font-black text-slate-900 mb-2">Xác Nhận Nộp Bài Kiểm Tra?</h3>
+      
+      <div class="p-4 rounded-2xl bg-slate-50 border border-slate-200 text-sm mb-4">
+        <div class="flex justify-between mb-1">
+          <span class="text-slate-600">Số câu đã hoàn thành:</span>
+          <span id="submit-modal-answered" class="font-bold text-blue-600">0/22</span>
+        </div>
+        <div class="flex justify-between">
+          <span class="text-slate-600">Số câu còn bỏ trống:</span>
+          <span id="submit-modal-unanswered" class="font-bold text-rose-500">0</span>
+        </div>
+      </div>
+
+      <div id="submit-modal-warning" class="text-xs text-amber-700 bg-amber-50 p-3 rounded-xl border border-amber-200 mb-6 hidden">
+        ⚠️ Bạn vẫn còn câu hỏi chưa trả lời! Bạn có chắc muốn nộp bài sớm không?
+      </div>
+
+      <div class="flex gap-3">
+        <button onclick="StudentExam.cancelSubmit()" class="flex-1 py-3 rounded-xl border border-slate-300 font-bold text-xs text-slate-700 hover:bg-slate-100 transition-colors">
+          Tiếp Tục Làm Bài
+        </button>
+        <button onclick="StudentExam.submitExam()" class="flex-1 py-3 rounded-xl bg-emerald-600 hover:bg-emerald-700 font-bold text-xs text-white shadow-md transition-all">
+          Xác Nhận Nộp Bài
+        </button>
+      </div>
+    </div>
+  </div>
+
+  <!-- Submitting Overlay -->
+  <div id="submitting-overlay" class="fixed inset-0 bg-slate-900/80 backdrop-blur-sm z-50 flex items-center justify-center p-4 hidden">
+    <div class="text-center text-white">
+      <div class="w-14 h-14 border-4 border-emerald-400 border-t-transparent rounded-full animate-spin mx-auto mb-4"></div>
+      <h3 class="text-lg font-black mb-1">Đang chấm điểm bài làm...</h3>
+      <p class="text-xs text-slate-300">Vui lòng chờ trong giây lát</p>
+    </div>
+  </div>
+
+  <script src="/static/js/app.js"></script>
+  <script src="/static/js/student.js"></script>
+</body>
+</html>
